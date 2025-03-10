@@ -119,8 +119,11 @@ function getCountDaysOnPeriod(dateStart, dateEnd) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const targetDate = new Date(date);
+  const startDate = new Date(period.start);
+  const endDate = new Date(period.end);
+  return targetDate >= startDate && targetDate <= endDate;
 }
 
 /**
@@ -134,8 +137,18 @@ function isDateInPeriod(/* date, period */) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  const options = {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true,
+    timeZone: 'UTC',
+  };
+  return new Date(date).toLocaleString('en-US', options);
 }
 
 /**
@@ -150,8 +163,14 @@ function formatDate(/* date */) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  const daysIsMonth = new Date(year, month, 0).getDate();
+  return Array.from(
+    { length: daysIsMonth },
+    (_, day) => new Date(year, month - 1, day + 1)
+  )
+    .map((date) => date.getDay())
+    .filter((dayOfWeek) => dayOfWeek === 0 || dayOfWeek === 6).length;
 }
 
 /**
@@ -167,8 +186,15 @@ function getCountWeekendsInMonth(/* month, year */) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
+function getWeekNumberByDate(date) {
+  const tempDate = new Date(date);
+  tempDate.setHours(0, 0, 0, 0);
+  tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7));
+  const firstThursday = new Date(tempDate.getFullYear(), 0, 1);
+  const weekNumber = Math.ceil(
+    ((tempDate - firstThursday) / (24 * 60 * 60 * 1000) + 1) / 7
+  );
+  return weekNumber;
 }
 
 /**
